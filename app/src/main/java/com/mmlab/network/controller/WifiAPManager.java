@@ -16,8 +16,11 @@ public class WifiAPManager {
     private static final String TAG = WifiAPManager.class.getName();
 
     private Context mContext;
+
     private WifiManager mWifiManager;
+
     private static final Map<String, Method> methodMap = new HashMap<String, Method>();
+
     public boolean isHtc = false;
 
     public WifiAPManager(Context context) {

@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
@@ -56,7 +55,7 @@ public class NetworkManager {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        intentFilter.addAction(WifiManager.RSSI_CHANGED_ACTION);
 
         mContext.registerReceiver(broadcastReceiver, intentFilter);
     }
@@ -131,6 +130,7 @@ public class NetworkManager {
             HashMap<String, WifiDoc> wifiDocs = getWifiDocs();
             if (wifiInfo != null && wifiInfo.getSSID() != null && wifiDocs.containsKey(SSID)) {
                 wifiDocs.get(SSID).state = WifiDoc.FINISHED;
+                wifiDocs.get(SSID).level = wifiInfo.getRssi();
             }
 
             SupplicantState supplicantState = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
@@ -210,12 +210,7 @@ public class NetworkManager {
         }
     }
 
-    /**
-     * 提供一個外部接口，傳入要連接的尚未認證或想更改認證的無線網絡
-     * 回傳值為真，只能說明密碼沒有輸錯，並且網路可用，但不一定連接上
-     */
     public boolean connectUnconfigured(WifiDoc wifiDoc) {
-        // 更新認證的狀態
         WifiConfiguration wifiConfiguration = getConfiguredNetwork(wifiDoc.SSID);
         if (wifiConfiguration != null) {
             mWifiManager.removeNetwork(wifiConfiguration.networkId);
@@ -231,8 +226,7 @@ public class NetworkManager {
         return mWifiManager.enableNetwork(netID, true) && mWifiManager.saveConfiguration() && mWifiManager.reconnect();
     }
 
-    private WifiConfiguration createWifiInfo(String SSID, String SSIDpwd,
-                                             int type) {
+    private WifiConfiguration createWifiInfo(String SSID, String SSIDpwd, int type) {
 
         WifiConfiguration config = new WifiConfiguration();
 
@@ -328,7 +322,6 @@ public class NetworkManager {
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();
         pHandler = new Handler(handlerThread.getLooper()) {
-            @Override
             public void handleMessage(Message msg) {
                 int what = msg.what;
                 Object object = msg.obj;
