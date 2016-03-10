@@ -7,15 +7,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.mmlab.network.R;
 import com.mmlab.network.model.WifiDoc;
 import com.mmlab.network.view.DividerItemDecoration;
+import com.mmlab.network.view.HotspotDialog;
+import com.mmlab.network.view.NetworkDialog;
 import com.mmlab.network.view.WifiDocDialog;
 
 import java.util.ArrayList;
@@ -25,7 +28,7 @@ public class NetworkActivity extends AppCompatActivity {
 
     private static final String TAG = NetworkActivity.class.getName();
 
-    MaterialDialog materialDialog;
+    Toolbar toolbar;
     NetworkManager networkManager;
     WifiDocAdapter wifiDocAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
@@ -34,6 +37,25 @@ public class NetworkActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_network);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ImageButton imageButton_network = (ImageButton) toolbar.findViewById(R.id.imageButton_network);
+        imageButton_network.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                NetworkDialog dialog = new NetworkDialog();
+                dialog.show(getFragmentManager(), "networkDialog");
+            }
+        });
+
+        ImageButton imageButton_hotspot = (ImageButton) toolbar.findViewById(R.id.imageButton_hotspot);
+        imageButton_hotspot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                HotspotDialog dialog = new HotspotDialog();
+                dialog.show(getFragmentManager(), "hotspotDialog");
+            }
+        });
 
         networkManager = new NetworkManager(getApplicationContext());
         networkManager.setOnResultsListener(new NetworkManager.OnResultsListener() {
@@ -70,8 +92,11 @@ public class NetworkActivity extends AppCompatActivity {
         });
         wifiDocAdapter.setOnItemClickLitener(new WifiDocAdapter.OnItemClickLitener() {
             public void onItemClick(View view, int position) {
-                if (materialDialog != null) materialDialog.dismiss();
-                materialDialog = WifiDocDialog.createDialog(networkManager, NetworkActivity.this, wifiDocs.get(position));
+                WifiDocDialog dialog = new WifiDocDialog();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("wifidoc", wifiDocs.get(position));
+                dialog.setArguments(bundle);
+                dialog.show(getFragmentManager(), "wifidocDialog");
             }
 
             public void onItemLongClick(View view, int position) {

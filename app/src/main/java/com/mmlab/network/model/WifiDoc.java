@@ -7,10 +7,11 @@ import java.io.Serializable;
 public class WifiDoc implements Serializable {
     private static final long serialVersionUID = 5117886679575134589L;
 
-    public static final String AUTHENTICATING = "WifiRecord.AUTHENTICATING";
-    public static final String COMPLETED = "WifiRecord.COMPLETED";
-    public static final String DISCONNECTED = "WifiRecord.DISCONNECTED";
-    public static final String FINISHED = "WifiRecord.FINISHED";
+    public static final String AUTHENTICATING = "WifiDoc.AUTHENTICATING";
+    public static final String COMPLETED = "WifiDoc.COMPLETED";
+    public static final String DISCONNECTED = "WifiDoc.DISCONNECTED";
+    public static final String FINISHED = "WifiDoc.FINISHED";
+    public static final String ERROR_AUTHENTICATING = "WifiDoc.ERROR_AUTHENTICATING";
 
     public static final int WPA = 0;
     public static final int WPA2 = 1;
@@ -67,6 +68,9 @@ public class WifiDoc implements Serializable {
                 break;
             case DISCONNECTED:
                 security = "中斷連線";
+                break;
+            case ERROR_AUTHENTICATING:
+                security = "認證失敗";
                 break;
             default:
                 String capabilities = this.capabilities;

@@ -1,6 +1,8 @@
 package com.mmlab.network.view;
 
-import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
@@ -18,17 +20,24 @@ import com.mmlab.network.R;
 import com.mmlab.network.controller.NetworkManager;
 import com.mmlab.network.model.WifiDoc;
 
-public class WifiDocDialog {
+public class WifiDocDialog extends DialogFragment {
     private static String TAG = "WifiDocDialog";
 
     private static MaterialDialog materialDialog = null;
 
-    public static MaterialDialog createDialog(final NetworkManager networkManager, final Activity activity, final WifiDoc wifiDoc) {
+    private WifiDoc wifiDoc;
 
-        // get prompts.xml view
-        LayoutInflater layoutInflater = LayoutInflater.from(activity);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        wifiDoc = (WifiDoc) getArguments().getSerializable("wifidoc");
+    }
+
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        final NetworkManager networkManager = new NetworkManager(getActivity().getApplicationContext());
+        LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
         View promptView = layoutInflater.inflate(R.layout.wifidoc_dialog, null);
-        final MaterialDialog.Builder materialDialogBuilder = new MaterialDialog.Builder(activity);
+        final MaterialDialog.Builder materialDialogBuilder = new MaterialDialog.Builder(getActivity());
         materialDialogBuilder.customView(promptView, true);
 
         final TextView securityshowTextView = (TextView) promptView.findViewById(R.id.securityshow_textView);
@@ -78,7 +87,7 @@ public class WifiDocDialog {
 
         if (networkManager.getConfiguredNetwork(wifiDoc.SSID) != null) {
 
-            materialDialogBuilder.neutralText("清除").onNeutral(new MaterialDialog.SingleButtonCallback() {
+            materialDialogBuilder.neutralText(R.string.clear).onNeutral(new MaterialDialog.SingleButtonCallback() {
                 public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                     networkManager.disconnectNetwork(networkManager.getConfiguredNetwork(wifiDoc.SSID).networkId);
                 }
@@ -86,7 +95,7 @@ public class WifiDocDialog {
         }
 
         if (!networkManager.getActivedSSID().equals(wifiDoc.SSID)) {
-            materialDialogBuilder.positiveText("連線").onPositive(new MaterialDialog.SingleButtonCallback() {
+            materialDialogBuilder.positiveText(R.string.connect).onPositive(new MaterialDialog.SingleButtonCallback() {
                 public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                     if (passwordshowEditView.getVisibility() == View.VISIBLE) {
                         wifiDoc.SSIDpwd = passwordshowEditView.getText().toString();
@@ -96,14 +105,17 @@ public class WifiDocDialog {
             });
         }
 
-        materialDialogBuilder.negativeText("取消").onNegative(new MaterialDialog.SingleButtonCallback() {
+        materialDialogBuilder.negativeText(R.string.dismiss).onNegative(new MaterialDialog.SingleButtonCallback() {
             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                 materialDialog.dismiss();
             }
         });
 
 
-        materialDialog = materialDialogBuilder.build();
+        materialDialog = materialDialogBuilder
+                .neutralColorRes(R.color.colorPrimary)
+                .negativeColorRes(R.color.colorPrimary)
+                .positiveColorRes(R.color.colorPrimary).build();
         materialDialog.show();
         if (wifiDoc.getWifiEncrypt() == WifiDoc.NOPASS || networkManager.getConfiguredNetwork(wifiDoc.SSID) != null || !wifiDoc.SSIDpwd.isEmpty()) {
             materialDialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);

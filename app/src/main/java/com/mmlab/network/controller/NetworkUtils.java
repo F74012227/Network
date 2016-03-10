@@ -19,13 +19,13 @@ public class NetworkUtils {
         return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_MOBILE);
     }
 
-    public static boolean isWiFiEnabled(Context context) {
+    public static boolean isWifiEnabled(Context context) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         return wifiManager.isWifiEnabled();
     }
 
     public static boolean isAPEnabled(Context context) {
-        WifiManager wifimanager = (WifiManager) context.getSystemService(context.WIFI_SERVICE);
+        WifiManager wifimanager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         try {
             Method method = wifimanager.getClass().getDeclaredMethod("isWifiApEnabled");
             method.setAccessible(true);
@@ -82,9 +82,9 @@ public class NetworkUtils {
         }
     }
 
-    public static void setWiFiEnabled(Context context, boolean enabled) {
+    public static void setWifiEnabled(Context context, boolean enabled) {
         if (enabled)
-            setAPEnabled(context, !enabled);
+            setAPEnabled(context, false);
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         wifiManager.setWifiEnabled(enabled);
     }
@@ -93,7 +93,7 @@ public class NetworkUtils {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         try {
             if (enabled) {
-                wifiManager.setWifiEnabled(false);
+                setWifiEnabled(context, false);
             }
             Method method = wifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
             method.invoke(wifiManager, null, enabled);

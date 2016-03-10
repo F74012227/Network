@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingLeft="25dp"
+    android:paddingRight="25dp"
+    android:paddingTop="10dp">
+
+
+    <TextView
+        android:id="@+id/ssid_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="網路SSID"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/ssidshow_editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/passwordshow_bg"
+        android:ems="10"
+        android:password="false"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/security_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="安全性"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <Spinner
+        android:id="@+id/spinnner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/password_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="密碼"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/passwordshow_editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/passwordshow_bg"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:password="false"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/passwordhint_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="密碼最少需要包含八個字元"
+        android:textColor="@android:color/black"
+        android:textSize="14sp" />
+
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="顯示密碼" />
+
+</LinearLayout>

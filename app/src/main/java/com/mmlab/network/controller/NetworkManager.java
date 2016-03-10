@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
@@ -29,12 +31,34 @@ public class NetworkManager {
 
     private WifiManager mWifiManager;
 
+    private ConnectivityManager mConnectivityManager;
+
     private OnResultsListener onResultsListener;
 
     public NetworkManager(Context context) {
         this.mContext = context;
         mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         init();
+    }
+
+    public NetworkInfo getActiveNetworkInfo() {
+        return mConnectivityManager.getActiveNetworkInfo();
+    }
+
+    public boolean isConnected() {
+        NetworkInfo info = getActiveNetworkInfo();
+        return (info != null && info.isConnected());
+    }
+
+    public boolean isConnectedWifi() {
+        NetworkInfo info = getActiveNetworkInfo();
+        return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI);
+    }
+
+    public boolean isConnectedMobile() {
+        NetworkInfo info = getActiveNetworkInfo();
+        return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_MOBILE);
     }
 
     public void setOnResultsListener(OnResultsListener onResultsListener) {
@@ -129,7 +153,9 @@ public class NetworkManager {
 
             HashMap<String, WifiDoc> wifiDocs = getWifiDocs();
             if (wifiInfo != null && wifiInfo.getSSID() != null && wifiDocs.containsKey(SSID)) {
-                wifiDocs.get(SSID).state = WifiDoc.FINISHED;
+                if (isConnectedWifi()) {
+                    wifiDocs.get(SSID).state = WifiDoc.FINISHED;
+                }
                 wifiDocs.get(SSID).level = wifiInfo.getRssi();
             }
 
@@ -172,6 +198,9 @@ public class NetworkManager {
 
             int supplicant_error = intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1);
             if (supplicant_error == WifiManager.ERROR_AUTHENTICATING) {
+                if (wifiInfo != null && wifiInfo.getSSID() != null && wifiDocs.containsKey(SSID)) {
+                    wifiDocs.get(SSID).state = WifiDoc.ERROR_AUTHENTICATING;
+                }
                 Log.d(TAG, "ERROR_AUTHENTICATING...");
             }
 
